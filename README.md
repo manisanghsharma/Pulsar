@@ -1,6 +1,9 @@
 # Pulsar
 
-An auto clicker and macro recorder for macOS. Native SwiftUI, universal (Apple Silicon + Intel), macOS 13 Ventura or later.
+An auto clicker and macro recorder for macOS and Windows.
+
+- **macOS:** native SwiftUI, universal (Apple Silicon + Intel), macOS 13 Ventura or later.
+- **Windows (beta):** native WPF, Windows 10 or 11 (64-bit), one portable `.exe` with nothing to install.
 
 ![Pulsar: auto clicker & macro recorder for macOS](docs/social-preview.png)
 
@@ -24,12 +27,12 @@ An auto clicker and macro recorder for macOS. Native SwiftUI, universal (Apple S
 - Start/stop clicking: **F6**
 - Play/stop macro: **F7**
 - Start/stop recording: **F8**
-- Rebind any of them to a key combo (e.g. ⌃S) or a mouse button, side buttons included
+- Rebind any of them to a key combo (e.g. ⌃S or Ctrl+S) or a mouse button, side buttons included
 - Optional "hold to click" mode: clicks only while the shortcut is held down
 
-Settings and your last macro are remembered between launches. A menu bar icon gives quick access to start, stop and play.
+Settings and your last macro are remembered between launches. A menu bar icon (macOS) or tray icon (Windows) gives quick access to start, stop and play.
 
-## Install
+## Install on macOS
 
 1. Download `Pulsar.dmg` from the [latest release](../../releases/latest).
 2. Open it and drag **Pulsar** into **Applications**.
@@ -52,6 +55,16 @@ Pulsar needs Accessibility permission to click and to hear your shortcuts anywhe
 
 Always run the copy in `/Applications`, not the one inside the DMG.
 
+## Install on Windows
+
+1. Download `Pulsar.exe` from the [latest release](../../releases/latest) and put it anywhere, e.g. your Desktop.
+2. Double-click it. The app isn't code-signed, so Windows SmartScreen may say "Windows protected your PC": click **More info → Run anyway**.
+
+No permission setup is needed. Notes:
+- **Closing the window keeps Pulsar running in the tray** so your shortcuts keep working. Right-click the tray icon → **Quit Pulsar** to exit.
+- **Apps running as administrator** (some games and installers) ignore input from normal apps. To click or record in them, right-click `Pulsar.exe` → **Run as administrator**.
+- Settings live in `%APPDATA%\Pulsar`. Macro files aren't interchangeable between the macOS and Windows versions.
+
 ## Usage
 
 **Clicker tab:** set the speed, button, position and stop condition, then press **Start Clicking** or **F6**. To click a fixed spot, choose **Fixed point → Pick Location** and click anywhere on screen.
@@ -63,6 +76,8 @@ Always run the copy in `/Applications`, not the one inside the DMG.
 > On laptops, function keys may need **fn** (e.g. fn+F6) unless "Use F1, F2, etc. keys as standard function keys" is on in Keyboard settings.
 
 ## Build from source
+
+### macOS
 
 Requires Xcode command line tools (Swift 5.9+).
 
@@ -78,6 +93,16 @@ This compiles a universal binary, renders the icon, and writes `build/Pulsar.app
 
 For quick iteration you can also run `swift run`, but macOS then asks for Accessibility for your terminal instead of Pulsar.
 
+### Windows
+
+Requires the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
+
+```bash
+dotnet publish windows/Pulsar.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -o out
+```
+
+This writes `out/Pulsar.exe`. GitHub Actions runs the same build on every push that touches `windows/`, and attaches the `.exe` to each published release.
+
 ## Project layout
 
 | Path | What it holds |
@@ -88,3 +113,7 @@ For quick iteration you can also run `swift run`, but macOS then asks for Access
 | `Sources/Pulsar/Views.swift` | All SwiftUI views and the color theme |
 | `scripts/make_assets.swift` | Draws the app icon and the DMG background |
 | `build.sh` | Builds the `.app` and `.dmg` |
+| `windows/Model.cs` | Windows: settings, global hooks, hotkeys, clicking, recording, playback, macro files |
+| `windows/Native.cs` | Windows: Win32 hooks and `SendInput` |
+| `windows/MainWindow.xaml` | Windows: the window's layout; styles live in `App.xaml` |
+| `.github/workflows/windows.yml` | Builds `Pulsar.exe` on GitHub Actions |
