@@ -5,7 +5,7 @@ using System.Text;
 namespace Pulsar;
 
 /// Win32 calls for global hooks and synthetic input.
-static class Native
+public static class Native
 {
     public const int WH_KEYBOARD_LL = 13, WH_MOUSE_LL = 14;
     public const int WM_KEYDOWN = 0x100, WM_KEYUP = 0x101, WM_SYSKEYDOWN = 0x104, WM_SYSKEYUP = 0x105;
