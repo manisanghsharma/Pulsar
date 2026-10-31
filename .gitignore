@@ -4,3 +4,5 @@ build/
 .swiftpm/
 xcuserdata/
 screenshots/
+windows/bin/
+windows/obj/
