@@ -370,7 +370,7 @@ public sealed class Model : Observable
         }
         bool isDown = kind is "kd" or "md";
 
-        if (Capturing is string slot && isDown)
+        if (Capturing is string capSlot && isDown)
         {
             int mods = Native.Mods;
             if (kind == "kd" && code == 0x1B && mods == 0) // Esc cancels
@@ -385,8 +385,8 @@ public sealed class Model : Observable
             else if (kind == "md" && (code >= 2 || mods != 0)) t = new Trigger("mouse", code, mods, Trigger.MouseName(code));
             if (t == null) return false;
             foreach (var other in Slots)
-                if (other != slot && GetSlot(other) == t) SetSlot(other, null); // one action per shortcut
-            SetSlot(slot, t);
+                if (other != capSlot && GetSlot(other) == t) SetSlot(other, null); // one action per shortcut
+            SetSlot(capSlot, t);
             Capturing = null;
             swallowedUps.Add(id);
             return true;
